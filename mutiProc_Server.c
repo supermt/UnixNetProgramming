@@ -27,30 +27,32 @@ void process_cli(int connfd, struct sockaddr_in client)
 int num;
 char  recvbuf[MAXDATASIZE], sendbuf[MAXDATASIZE];
 printf("Yougot a connection from %s. ",inet_ntoa(client.sin_addr) );
-while(1){
-  num = recv(connfd,recvbuf, MAXDATASIZE,0);
-  printf("%s\t %d Bytes\n", recvbuf,num);
-  if (num<=MAXDATASIZE) break;
-}
-if (num == 0)
-{
-close(connfd);
-printf("Client disconnected.\n");
-return;
-}
+  while (1) {
+    while(1){
+      num = recv(connfd,recvbuf, MAXDATASIZE,0);
+      printf("%s\t %d Bytes\n", recvbuf,num);
+      if (num<=MAXDATASIZE) break;
+    }
+    if (num == 0)
+    {
+    close(connfd);
+    printf("Client disconnected.\n");
+    return;
+    }
 
-struct tm *ptr;
-time_t It;
-It=time(NULL);
-ptr = localtime(&It);
-char * timeStr[20];
-sprintf(timeStr,"\t%d:%d:%d\n",ptr->tm_hour,ptr->tm_min,ptr->tm_sec);
+    struct tm *ptr;
+    time_t It;
+    It=time(NULL);
+    ptr = localtime(&It);
+    char * timeStr[20];
+    sprintf(timeStr,"\t%d:%d:%d\n",ptr->tm_hour,ptr->tm_min,ptr->tm_sec);
 
-sprintf(sendbuf,"%s",recvbuf);
-strcat(sendbuf,timeStr);
-puts(sendbuf);
-send(connfd,sendbuf,strlen(sendbuf),0);
-close(connfd);
+    sprintf(sendbuf,"%s",recvbuf);
+    strcat(sendbuf,timeStr);
+    puts(sendbuf);
+    send(connfd,sendbuf,strlen(sendbuf),0);
+    //close(connfd);
+  }
 }
 
 int main()
@@ -64,7 +66,8 @@ int main()
   int  len;
 
   if ((listenfd =socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-    perror("Creatingsocket failed.");
+    perror("Create Socket failed.");
+    close(listenfd);
     exit(1);
   }
 

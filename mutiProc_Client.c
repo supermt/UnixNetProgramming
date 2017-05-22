@@ -10,6 +10,15 @@
 
 #define MAXDATASIZE 100
 
+void func_waitpid(int signo) {
+    pid_t pid;
+    int stat;
+    while( (pid = waitpid(-1, &stat, WNOHANG)) > 0 ) {
+        printf( "child %d exit\n", pid );
+    }
+    return;
+}
+
 void process(FILE *fp,char * argv[])
 {
   int sockfd;
@@ -46,7 +55,7 @@ void process(FILE *fp,char * argv[])
     //
     // int received,echolen=strlen(sendBuff);
 
-  sprintf(sendBuff,"hello");
+  sprintf(sendBuff,"hello %d",getpid());
   int received=0,echolen=strlen(sendBuff);
   send(sockfd,sendBuff, strlen(sendBuff),0);
 
@@ -67,6 +76,7 @@ void process(FILE *fp,char * argv[])
 
 int main(int argc,char *argv[])
 {
+
   //argv[1]:  目的IP
   //argv[2]:  目的端口
   //argv[3]:  同时并发数量
